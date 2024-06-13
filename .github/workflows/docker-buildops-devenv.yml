@@ -1,0 +1,63 @@
+name: Dev Environment Builder
+
+# this is temporary for now
+on:
+  workflow_dispatch:
+
+env:
+  # github.repository as <account>/<repo>
+  IMAGE_NAME_PREFIX: ${{ github.repository }}
+
+permissions:
+  contents: read
+  packages: write
+  # This is used to complete the identity challenge
+  # with sigstore/fulcio when running outside of PRs.
+  id-token: write
+
+jobs:
+  metarepo:
+    name: Custom image on Material for Mkdocs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Workaround: https://github.com/docker/build-push-action/issues/461
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          buildkitd-flags: --debug
+
+      # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Log into RHQCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: quay.io
+          username: ${{ secrets.RHQCR_BOT_USERNAME }}
+          password: ${{ secrets.RHQCR_BOT_TOKEN }}
+      - name: Login into GLCR on mau.dev
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: dock.mau.dev
+          username: ${{ secrets.LAB_USERNAME }}
+          password: ${{ secrets.LAB_MAUDEV_TOKEN }}
+      
+      # Install the cosign tool except on PR
+      # https://github.com/sigstore/cosign-installer
+      - name: Install cosign
+        if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 #v3.5.0
+        with:
+          cosign-release: 'v2.2.4'
