@@ -67,8 +67,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: dock.mau.dev
-          username: ${{ secrets.LAB_USERNAME }}
-          password: ${{ secrets.LAB_MAUDEV_TOKEN }}
+          username: ${{ secrets.GLCR_MAUDEV_DEPLOY_USERNAME }}
+          password: ${{ secrets.GLCR_MAUDEV_DEPLOY_TOKEN }}
       
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer

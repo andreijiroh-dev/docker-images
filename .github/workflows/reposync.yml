@@ -1,0 +1,22 @@
+name: Repo Sync
+on:
+  push:
+  schedule:
+    - cron: "* */3 * * *"
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+      - name: Setup git
+        run: |
+          git config --global user.name "Recap Time Bot"
+          git config --global user.email "service-accounts+git@recaptime.dev"
+          git remote add gitlab "https://${{ secrets.GLCR_MAUDEV_DEPLOY_USERNAME }}:${{ secrets.GLCR_MAUDEV_DEPLOY_TOKEN }}@mau.dev/andreijiroh-dev/docker-images"
+          git fetch gitlab
+      - name: Push mirror
+        run: git push gitlab --mirror
