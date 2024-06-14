@@ -4,7 +4,14 @@ FROM python:3.12-alpine AS buildkit
 # we'll go with the official images instead.
 
 ENV PACKAGES=/usr/local/lib/python3.11/site-packages PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/.local/bin PYTHONDONTWRITEBYTECODE=1
-LABEL org.opencontainers.image.description="GitLab CI image for a custom mkdocs-material Docker image, alongside tools @ajhalili2006 use."
+LABEL org.opencontainers.image.description="GitLab CI image for a custom mkdocs-material Docker image, alongside tools @ajhalili2006 use." \
+      org.opencontainers.image.source="https://github.com/andreijiroh-dev/docker-images" \
+      org.opencontainers.image.vendor="Andrei Jiroh Halili" \
+      org.opencontainers.image.url="https://go.andreijiroh.xyz/mkdocs-material" \
+      org.opencontainers.image.documentation="https://github.com/andreijiroh-dev/docker-images/blob/main/docker/mkdocs-material/README.md" \
+      dev.recaptime.opensource.stabilityLevel="unstable" dev.recaptime.opensource.maintainer="ajhalili2006" \
+      org.opencontainers.image.license="MPL-2.0"
+      
 
 # Since hadolint isn't in the package repos for Alpine yet, we'll copying from the offical
 # Docker image instead.

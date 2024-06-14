@@ -7,8 +7,7 @@ name: Docker Image Builds
 
 on:
   schedule:
-    - cron: '30 0 * * *'
-    - cron: '30 12 * * *'
+    - cron: '30 */12 * * *'
   push:
   pull_request:
     branches: [ "main" ]
@@ -124,4 +123,4 @@ jobs:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: echo "${TAGS}" | xargs -I {} cosign sign --yes --force {}@${DIGEST}
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}

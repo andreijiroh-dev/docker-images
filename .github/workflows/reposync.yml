@@ -1,8 +1,8 @@
 name: Repo Sync
 on:
-  push:
+  workflow_run:
   schedule:
-    - cron: "* */3 * * *"
+    - cron: "30 0 * * *"
 
 jobs:
   mirror:
@@ -20,3 +20,4 @@ jobs:
           git fetch gitlab
       - name: Push mirror
         run: git push gitlab --mirror
+        continue-on-error: true
