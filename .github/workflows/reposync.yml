@@ -1,6 +1,6 @@
 name: Repo Sync
 on:
-  workflow_run:
+  workflow_dispatch:
   schedule:
     - cron: "30 0 * * *"
 
@@ -18,6 +18,8 @@ jobs:
           git config --global user.email "service-accounts+git@recaptime.dev"
           git remote add gitlab "https://${{ secrets.GLCR_MAUDEV_DEPLOY_USERNAME }}:${{ secrets.GLCR_MAUDEV_DEPLOY_TOKEN }}@mau.dev/andreijiroh-dev/docker-images"
           git fetch gitlab
-      - name: Push mirror
-        run: git push gitlab --mirror
+      - name: Sync with GitLab repo
+        run: |
+          git merge gitlab/main --ff-only # figure out about rebase later on
+          git push gitlab --mirror
         continue-on-error: true
