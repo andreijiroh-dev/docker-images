@@ -107,9 +107,9 @@ jobs:
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
-      - name: Build and push Docker image
+      - name: "Build and push Docker image [nightly builds]"
         if: github.event_name == 'schedule'
-        id: build
+        id: nightly-build
         uses: docker/build-push-action@v4.1.1
         with:
           context: docker/mkdocs-material
@@ -123,21 +123,29 @@ jobs:
           cache-to: type=gha,mode=max,scope=buildkit-mkdocs-material
       
       - name: Build and push Docker image
-        if: github.event_name == 'schedule'
+        if: github.event_name != 'schedule'
         id: build
         uses: docker/build-push-action@v4.1.1
         with:
           context: docker/mkdocs-material
           #file: Dockerfile
           # workaround: https://github.com/moby/buildkit/issues/2713#issuecomment-1068540101
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           #load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=buildkit-mkdocs-material
           cache-to: type=gha,mode=max,scope=buildkit-mkdocs-material
 
       # First, we sign our images with cosign first...
+      - name: "Sign the published Docker image with cosign [nightly builds]"
+        if: ${{ github.event_name == 'schedule' }}
+        id: cosign-nightly-builds
+        env:
+          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
+          TAGS: ${{ steps.meta.outputs.tags }}
+          DIGEST: ${{ steps.nightly-build.outputs.digest }}
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+
       - name: Sign the published Docker image with cosign
         if: ${{ github.event_name != 'pull_request' }}
         id: cosign
@@ -148,16 +156,19 @@ jobs:
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
       # ...and then generate a build attestation via actions/attest-build-provenance workflow.
-      - uses: actions/attest-build-provenance@v1
+      - name: "Generate attestation for GitHub API access [nightly builds]"
+        uses: actions/attest-build-provenance@v1
+        if: ${{ github.event_name != 'pull_request' }}
+        id: attest-nightly-builds
+        with:
+          subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+          subject-digest: ${{ steps.nightly-build.outputs.digest }}
+          push-to-registry: true
+      - name: Generate attestation for GitHub API access
+        uses: actions/attest-build-provenance@v1
         if: ${{ github.event_name != 'pull_request' }}
         id: attest
         with:
           subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
-      # Note that we upload the bundle file from attest job above for easy access.
-      - uses: actions/upload-artifact@v4
-        if: ${{ github.event_name != 'pull_request' }}
-        with:
-          name: buildkit-attestation_mkdocs-material
-          path: ${{ steps.attest.outputs.bundle-path }}
