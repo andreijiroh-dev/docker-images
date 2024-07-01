@@ -1,0 +1,7 @@
+# yaml-language-server: $schema=https://github.com/hadolint/hadolint/raw/master/contrib/hadolint.json
+trusted-registries:
+- ghcr.io
+- quay.io
+- dock.mau.dev
+ignored:
+- DL3013

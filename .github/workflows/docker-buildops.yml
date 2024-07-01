@@ -26,10 +26,8 @@ permissions:
   attestations: write
 
 jobs:
-  mkdocs-material:
-    name: Custom image on Material for Mkdocs
+  lint:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,8 +36,19 @@ jobs:
       - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: docker/mkdocs-material/Dockerfile
+          dockerfile: Dockerfile
+          recursive: true
+          trusted-registries: quay.io, ghcr.io
         continue-on-error: true
+
+  mkdocs-material:
+    name: Custom image on Material for Mkdocs
+    runs-on: ubuntu-latest
+    needs: [ lint ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
@@ -99,7 +108,23 @@ jobs:
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
-        id: build-and-push
+        if: github.event_name == 'schedule'
+        id: build
+        uses: docker/build-push-action@v4.1.1
+        with:
+          context: docker/mkdocs-material
+          #file: Dockerfile
+          # workaround: https://github.com/moby/buildkit/issues/2713#issuecomment-1068540101
+          push: true
+          #load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=buildkit-mkdocs-material
+          cache-to: type=gha,mode=max,scope=buildkit-mkdocs-material
+      
+      - name: Build and push Docker image
+        if: github.event_name == 'schedule'
+        id: build
         uses: docker/build-push-action@v4.1.1
         with:
           context: docker/mkdocs-material
@@ -112,23 +137,27 @@ jobs:
           cache-from: type=gha,scope=buildkit-mkdocs-material
           cache-to: type=gha,mode=max,scope=buildkit-mkdocs-material
 
-      # https://github.com/sigstore/cosign
+      # First, we sign our images with cosign first...
       - name: Sign the published Docker image with cosign
         if: ${{ github.event_name != 'pull_request' }}
         id: cosign
         env:
           # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
           TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+          DIGEST: ${{ steps.build.outputs.digest }}
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+
+      # ...and then generate a build attestation via actions/attest-build-provenance workflow.
       - uses: actions/attest-build-provenance@v1
         if: ${{ github.event_name != 'pull_request' }}
         id: attest
         with:
           subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
-          subject-digest: ${{ steps.build-and-push.outputs.digest }}
+          subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
+      # Note that we upload the bundle file from attest job above for easy access.
       - uses: actions/upload-artifact@v4
+        if: ${{ github.event_name != 'pull_request' }}
         with:
           name: buildkit-attestation_mkdocs-material
           path: ${{ steps.attest.outputs.bundle-path }}

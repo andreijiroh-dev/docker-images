@@ -10,7 +10,7 @@ LABEL org.opencontainers.image.description="GitLab CI image for a custom mkdocs-
       org.opencontainers.image.url="https://go.andreijiroh.xyz/mkdocs-material" \
       org.opencontainers.image.documentation="https://github.com/andreijiroh-dev/docker-images/blob/main/docker/mkdocs-material/README.md" \
       dev.recaptime.opensource.stabilityLevel="unstable" dev.recaptime.opensource.maintainer="ajhalili2006" \
-      org.opencontainers.image.license="MPL-2.0"
+      dev.recaptime.opensource.license="MPL-2.0" dev.recaptime.opensource.repoOwnerType="staff-verified-public" org.opencontainers.image.license="MPL-2.0"
       
 
 # Since hadolint isn't in the package repos for Alpine yet, we'll copying from the offical
@@ -20,6 +20,9 @@ COPY --from=ghcr.io/hadolint/hadolint:latest-alpine /bin/hadolint /usr/bin/hadol
 # Load up our custom entrypoint script
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# https://github.com/hadolint/hadolint/wiki/DL4006
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
 # https://squidfunk.github.io/mkdocs-material/setup/setting-up-social-cards/#linux but for Alpine
 # Also installs Doppler CLI for accessing secrets securely within CI
@@ -35,7 +38,6 @@ RUN apk add --no-cache \
      coreutils \
      shellcheck \
      gcc \
-     libffi-dev \
      musl-dev \
      git \
      git-email \
@@ -67,7 +69,7 @@ RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs \
 # See https://www.jeffgeerling.com/blog/2023/how-solve-error-externally-managed-environment-when-installing-pip3
 # for context behind removing the EXTERNALLY-MANAGED file on distribution-built CPython binary releases.
 # Since we're using the official Python Docker image, we don't need to worry about that.
-RUN pip install --no-cache \
+RUN pip install --no-cache-dir \
       mkdocs-material \
       mkdocs-git-committers-plugin-2 \
       mkdocs-git-revision-date-localized-plugin \
