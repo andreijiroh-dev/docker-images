@@ -6,6 +6,14 @@
 
 Collection of Docker image recipes and related utilities in one monorepo. Licensed under MPL-2.0.
 
+* Issue Trackers
+  * JetBrains YouTrack: <https://ajhalili2006.youtrack.cloud/search/Docker%20Images%20Monorepo%20Issues-20?q=project:%20%7BDocker%20Images%20Monorepo%7D&p=0>
+  * GitHub: <https://github.com/andreijiroh-dev/docker-images/issues>
+  * mau.dev: <https://mau.dev/andreijiroh-dev/docker-images/issues>
+* Repository mirrors
+  * GitHub: <https://github.com/andreijiroh-dev/docker-images>
+  * mau.dev: <https://mau.dev/andreijiroh-dev/docker-images>
+
 ## Namespaces[^2]
 
 | Registry | URL | Description/Notes |

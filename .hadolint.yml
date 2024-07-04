@@ -3,5 +3,6 @@ trusted-registries:
 - ghcr.io
 - quay.io
 - dock.mau.dev
+- docker.io
 ignored:
 - DL3013

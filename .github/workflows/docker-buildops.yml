@@ -38,7 +38,7 @@ jobs:
         with:
           dockerfile: Dockerfile
           recursive: true
-          trusted-registries: quay.io, ghcr.io
+          trusted-registries: quay.io, ghcr.io,docker.io,dock.mau.dev
         continue-on-error: true
 
   mkdocs-material:
@@ -154,11 +154,12 @@ jobs:
           TAGS: ${{ steps.meta.outputs.tags }}
           DIGEST: ${{ steps.build.outputs.digest }}
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+        continue-on-error: true
 
       # ...and then generate a build attestation via actions/attest-build-provenance workflow.
       - name: "Generate attestation for GitHub API access [nightly builds]"
         uses: actions/attest-build-provenance@v1
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name == 'schedule' }}
         id: attest-nightly-builds
         with:
           subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
