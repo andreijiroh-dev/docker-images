@@ -147,7 +147,7 @@ jobs:
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
       - name: Sign the published Docker image with cosign
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name == 'push' }}
         id: cosign
         env:
           # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
@@ -167,7 +167,7 @@ jobs:
           push-to-registry: true
       - name: Generate attestation for GitHub API access
         uses: actions/attest-build-provenance@v1
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name == 'push' }}
         id: attest
         with:
           subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
