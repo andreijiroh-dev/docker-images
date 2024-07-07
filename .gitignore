@@ -1,5 +1,6 @@
 # dotenv files
 .env*
 .flaskenv*
+!.env.ci
 !.env.project
 !.env.vault
