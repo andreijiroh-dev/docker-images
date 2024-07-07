@@ -1,0 +1,11 @@
+version: 2
+enable-beta-ecosystems: true
+updates:
+  - directory: /
+    open-pull-requests-limit: 5
+    rebase-strategy: auto
+    package-ecosystem: github-actions
+    schedule:
+      interval: daily
+    assignees:
+      - ajhalili2006
