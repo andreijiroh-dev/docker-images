@@ -49,6 +49,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Load secrets with dotenvx
+        uses: andreijiroh-dev/dotenvx-action@v0.2.0
+        if: github.event_name == 'pull_request'
+        id: dotenvx
+        with:
+          path: .env.ci
+          key: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
@@ -63,22 +70,22 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+          username: ${{ steps.dotenvx.outputs.GHCR_BOT_USERNAME }}
+          password: ${{ steps.dotenvx.outputs.GHCR_BOT_PASSWORD }}
       - name: Log into RHQCR
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
           registry: quay.io
-          username: ${{ secrets.RHQCR_BOT_USERNAME }}
-          password: ${{ secrets.RHQCR_BOT_TOKEN }}
+          username: ${{ steps.dotenvx.outputs.RHQCR_BOT_USERNAME }}
+          password: ${{ steps.dotenvx.outputs.RHQCR_BOT_TOKEN }}
       - name: Login into GLCR on mau.dev
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
           registry: dock.mau.dev
-          username: ${{ secrets.GLCR_MAUDEV_DEPLOY_USERNAME }}
-          password: ${{ secrets.GLCR_MAUDEV_DEPLOY_TOKEN }}
+          username: ${{ steps.dotenvx.outputs.GLCR_MAUDEV_BOT_USERNAME }}
+          password: ${{ steps.dotenvx.outputs.GLCR_MAUDEV_BOT_PASSWORD }}
       
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
@@ -162,7 +169,9 @@ jobs:
         if: ${{ github.event_name == 'schedule' }}
         id: attest-nightly-builds
         with:
-          subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+          subject-path: |
+            ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+            dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
           subject-digest: ${{ steps.nightly-build.outputs.digest }}
           push-to-registry: true
       - name: Generate attestation for GitHub API access
