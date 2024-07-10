@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Load secrets with dotenvx
         uses: andreijiroh-dev/dotenvx-action@v0.2.0
-        if: github.event_name == 'pull_request'
+        if: github.event_name != 'pull_request'
         id: dotenvx
         with:
           path: .env.ci
