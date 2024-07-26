@@ -13,7 +13,7 @@ jobs:
         with:
           fetch-depth: "0"
       - name: Load secrets with dotenvx
-        uses: andreijiroh-dev/dotenvx-action@v0.2.0
+        uses: andreijiroh-dev/dotenvx-action@v0.3.0
         if: github.event_name != 'pull_request'
         id: dotenvx
         with:
