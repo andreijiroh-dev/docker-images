@@ -1,0 +1,34 @@
+{
+    "github-actions.workflows.pinned.workflows": [
+        ".github/workflows/docker-buildops.yml"
+    ],
+    "git.alwaysSignOff": true,
+    "conventionalCommits.scopes": [
+        "github-actions",
+        "dotenvx",
+        "docker",
+        "docs",
+        "readme",
+        "global",
+        "vscode"
+    ],
+    "conventionalCommitBuilder.scopes": [
+        "github-actions",
+        "dotenvx",
+        "docker",
+        "docs",
+        "readme",
+        "global",
+        "vscode"
+    ],
+    "conventionalCommitBuilder.autoCommit": false,
+    "conventionalCommits.autoCommit": false,
+    "conventionalCommits.showEditor": true,
+    "dotenv.enableAutocloaking": false,
+    "gitlens.remotes": [
+        {
+            "domain": "mau.dev",
+            "type": "GitLab"
+        }
+    ],
+}
