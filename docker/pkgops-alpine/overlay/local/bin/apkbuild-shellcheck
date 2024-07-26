@@ -1,0 +1,13 @@
+#!/bin/sh
+
+shellcheck -s ash \
+        -e SC2016 \
+        -e SC2086 \
+        -e SC2169 \
+        -e SC2155 \
+        -e SC2100 \
+        -e SC2209 \
+        -e SC2030 \
+        -e SC2031 \
+        -e SC1090 \
+        -xa /usr/share/abuild/APKBUILD_SHIM

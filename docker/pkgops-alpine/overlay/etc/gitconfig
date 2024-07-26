@@ -1,0 +1,14 @@
+# Credential manager stuff is being delated to GLab CLI, which installed through the devenv
+# Docker image.
+[credential "https://gitlab.com"]
+        helper = !glab auth git-credential
+[credential "https://gitlab.alpinelinux.org"]
+        helper = !glab auth git-credential
+
+# Technically speaking, git-lfs installs these lines on post-install basis, but we'll keep it here
+# for prosperity.
+[filter "lfs"]
+        smudge = git-lfs smudge -- %f
+        process = git-lfs filter-process
+        required = true
+        clean = git-lfs clean -- %f
