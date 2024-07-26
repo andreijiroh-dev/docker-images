@@ -1,28 +1,24 @@
 name: Docker Image Builds
 
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 on:
   schedule:
     - cron: '30 */12 * * *'
   push:
+    paths:
+      - docker/**
+      - .github/workflows/docker-buildops.yml
   pull_request:
     branches: [ "main" ]
+    paths:
+      - docker/**
 
 env:
-  # github.repository as <account>/<repo>
   IMAGE_NAME_PREFIX: ${{ github.repository }}
 
 permissions:
   contents: read
   packages: write
-  # This is used to complete the identity challenge with sigstore/fulcio when
-  # running outside of PRs.
   id-token: write
-  # https://github.com/actions/attest-build-provenance
   attestations: write
 
 jobs:
@@ -31,24 +27,21 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # TODO: treat lint errors as warnings on GitLab CI side
       - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
           recursive: true
-          trusted-registries: quay.io, ghcr.io,docker.io,dock.mau.dev
+          trusted-registries: quay.io, ghcr.io,docker.io,dock.mau.dev,index.docker.io,registry-1.docker.io
         continue-on-error: true
-
   mkdocs-material:
     name: Custom image on Material for Mkdocs
     runs-on: ubuntu-latest
     needs: [ lint ]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Load secrets with dotenvx
         uses: andreijiroh-dev/dotenvx-action@v0.2.0
         if: github.event_name != 'pull_request'
@@ -65,6 +58,11 @@ jobs:
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
+      - name: Log into Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ steps.dotenvx.outputs.DOCKER_USERNAME }}
+          password: ${{ steps.dotenvx.outputs.DOCKER_PASSWORD }}
       - name: Log into GHCR
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
@@ -78,7 +76,7 @@ jobs:
         with:
           registry: quay.io
           username: ${{ steps.dotenvx.outputs.RHQCR_BOT_USERNAME }}
-          password: ${{ steps.dotenvx.outputs.RHQCR_BOT_TOKEN }}
+          password: ${{ steps.dotenvx.outputs.RHQCR_BOT_PASSWORD }}
       - name: Login into GLCR on mau.dev
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
@@ -104,7 +102,8 @@ jobs:
           images: |
             ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
             dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
-            quay.io/ajhalili2006/mkdocs-material-build-ci
+            quay.io/andreijiroh-dev/mkdocs-material
+            index.docker.io/ajhalili2006/mkdocs-material
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,enable=true,priority=100,prefix=commit-,suffix=,format=long
@@ -143,42 +142,113 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-to: type=gha,mode=max,scope=buildkit-mkdocs-material
 
-      # First, we sign our images with cosign first...
-      - name: "Sign the published Docker image with cosign [nightly builds]"
-        if: ${{ github.event_name == 'schedule' }}
-        id: cosign-nightly-builds
-        env:
-          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
-          TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.nightly-build.outputs.digest }}
-        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
-
-      - name: Sign the published Docker image with cosign
-        if: ${{ github.event_name == 'push' }}
-        id: cosign
-        env:
-          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
-          TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.build.outputs.digest }}
-        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
-        continue-on-error: true
-
       # ...and then generate a build attestation via actions/attest-build-provenance workflow.
       - name: "Generate attestation for GitHub API access [nightly builds]"
         uses: actions/attest-build-provenance@v1
         if: ${{ github.event_name == 'schedule' }}
         id: attest-nightly-builds
         with:
-          subject-path: |
-            ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
-            dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+          subject-path: ${{ steps.meta.outputs.tags }}
           subject-digest: ${{ steps.nightly-build.outputs.digest }}
           push-to-registry: true
-      - name: Generate attestation for GitHub API access
+
+      - name: Generate image attestation
         uses: actions/attest-build-provenance@v1
         if: ${{ github.event_name == 'push' }}
         id: attest
         with:
-          subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+          subject-path: ${{ steps.meta.outputs.tags }}
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
+  pkgops-alpine:
+    name: "Alpine Linux - aports package maintainer image"
+    runs-on: ubuntu-latest
+    needs: [ lint ]
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Load secrets with dotenvx
+      uses: andreijiroh-dev/dotenvx-action@v0.2.0
+      if: github.event_name != 'pull_request'
+      id: dotenvx
+      with:
+        path: .env.ci
+        key: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
+
+    # Workaround: https://github.com/docker/build-push-action/issues/461
+    - name: Setup Docker buildx
+      uses: docker/setup-buildx-action@v2
+      with:
+        buildkitd-flags: --debug
+
+    # Login against a Docker registry except on PR
+    # https://github.com/docker/login-action
+    - name: Log into Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ steps.dotenvx.outputs.DOCKER_USERNAME }}
+        password: ${{ steps.dotenvx.outputs.DOCKER_PASSWORD }}
+    - name: Log into GHCR
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ steps.dotenvx.outputs.GHCR_BOT_USERNAME }}
+        password: ${{ steps.dotenvx.outputs.GHCR_BOT_PASSWORD }}
+    - name: Log into RHQCR
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v2
+      with:
+        registry: quay.io
+        username: ${{ steps.dotenvx.outputs.RHQCR_BOT_USERNAME }}
+        password: ${{ steps.dotenvx.outputs.RHQCR_BOT_PASSWORD }}
+    - name: Login into GLCR on mau.dev
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v2
+      with:
+        registry: dock.mau.dev
+        username: ${{ steps.dotenvx.outputs.GLCR_MAUDEV_BOT_USERNAME }}
+        password: ${{ steps.dotenvx.outputs.GLCR_MAUDEV_BOT_PASSWORD }}
+    
+    # Install the cosign tool except on PR
+    # https://github.com/sigstore/cosign-installer
+    - name: Install cosign
+      if: github.event_name != 'pull_request'
+      uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 #v3.5.0
+      with:
+        cosign-release: 'v2.2.4'
+
+    - name: Extract Docker metadata
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: |
+          ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
+          dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
+          quay.io/andreijiroh-dev/pkgops-alpine
+          index.docker.io/ajhalili2006/pkgsops-alpine
+        tags: |
+          type=raw,value=latest,enable={{is_default_branch}}
+          type=sha,enable=true,priority=100,prefix=commit-,suffix=,format=long
+          type=schedule,pattern=nightly
+          type=schedule,prefix=nightly-,pattern={{date 'YYYYMMDDhhmmss'}}
+          type=raw,prefix=branch-,value={{branch}}
+
+    - name: Build and push image
+      uses: docker/build-push-action@v4
+      id: build
+      with:
+        context: docker/pkgops-alpine
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+    
+    - name: Generate image attestation
+      uses: actions/attest-build-provenance@v1
+      if: ${{ github.event_name == 'push' }}
+      id: attest
+      with:
+        subject-path: ${{ steps.meta.outputs.tags }}
+        subject-digest: ${{ steps.build.outputs.digest }}
+        push-to-registry: true
