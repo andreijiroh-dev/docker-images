@@ -52,34 +52,34 @@ jobs:
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           buildkitd-flags: --debug
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
       - name: Log into Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ steps.dotenvx.outputs.DOCKER_USERNAME }}
           password: ${{ steps.dotenvx.outputs.DOCKER_PASSWORD }}
       - name: Log into GHCR
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ steps.dotenvx.outputs.GHCR_BOT_USERNAME }}
           password: ${{ steps.dotenvx.outputs.GHCR_BOT_PASSWORD }}
       - name: Log into RHQCR
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: quay.io
           username: ${{ steps.dotenvx.outputs.RHQCR_BOT_USERNAME }}
           password: ${{ steps.dotenvx.outputs.RHQCR_BOT_PASSWORD }}
       - name: Login into GLCR on mau.dev
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: dock.mau.dev
           username: ${{ steps.dotenvx.outputs.GLCR_MAUDEV_BOT_USERNAME }}
@@ -97,7 +97,7 @@ jobs:
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
             ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
@@ -112,26 +112,10 @@ jobs:
             type=raw,prefix=branch-,value={{branch}}
 
       # Build and push Docker image with Buildx (don't push on PR)
-      # https://github.com/docker/build-push-action
-      - name: "Build and push Docker image [nightly builds]"
-        if: github.event_name == 'schedule'
-        id: nightly-build
-        uses: docker/build-push-action@v4.1.1
-        with:
-          context: docker/mkdocs-material
-          #file: Dockerfile
-          # workaround: https://github.com/moby/buildkit/issues/2713#issuecomment-1068540101
-          push: true
-          #load: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=buildkit-mkdocs-material
-          cache-to: type=gha,mode=max,scope=buildkit-mkdocs-material
-      
+      # https://github.com/docker/build-push-action   
       - name: Build and push Docker image
-        if: github.event_name != 'schedule'
         id: build
-        uses: docker/build-push-action@v4.1.1
+        uses: docker/build-push-action@v6.1.1
         with:
           context: docker/mkdocs-material
           #file: Dockerfile
@@ -140,24 +124,17 @@ jobs:
           #load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-to: type=gha,mode=max,scope=buildkit-mkdocs-material
-
-      # ...and then generate a build attestation via actions/attest-build-provenance workflow.
-      - name: "Generate attestation for GitHub API access [nightly builds]"
-        uses: actions/attest-build-provenance@v1
-        if: ${{ github.event_name == 'schedule' }}
-        id: attest-nightly-builds
-        with:
-          subject-path: ${{ steps.meta.outputs.tags }}
-          subject-digest: ${{ steps.nightly-build.outputs.digest }}
-          push-to-registry: true
-
       - name: Generate image attestation
         uses: actions/attest-build-provenance@v1
         if: ${{ github.event_name == 'push' }}
+        continue-on-error: true
         id: attest
         with:
-          subject-path: ${{ steps.meta.outputs.tags }}
+          subject-path: |
+            ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+            dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+            quay.io/andreijiroh-dev/mkdocs-material
+            index.docker.io/ajhalili2006/mkdocs-material
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
   pkgops-alpine:
@@ -178,34 +155,34 @@ jobs:
 
     # Workaround: https://github.com/docker/build-push-action/issues/461
     - name: Setup Docker buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
       with:
         buildkitd-flags: --debug
 
     # Login against a Docker registry except on PR
     # https://github.com/docker/login-action
     - name: Log into Docker Hub
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         username: ${{ steps.dotenvx.outputs.DOCKER_USERNAME }}
         password: ${{ steps.dotenvx.outputs.DOCKER_PASSWORD }}
     - name: Log into GHCR
       if: github.event_name != 'pull_request'
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ steps.dotenvx.outputs.GHCR_BOT_USERNAME }}
         password: ${{ steps.dotenvx.outputs.GHCR_BOT_PASSWORD }}
     - name: Log into RHQCR
       if: github.event_name != 'pull_request'
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: quay.io
         username: ${{ steps.dotenvx.outputs.RHQCR_BOT_USERNAME }}
         password: ${{ steps.dotenvx.outputs.RHQCR_BOT_PASSWORD }}
     - name: Login into GLCR on mau.dev
       if: github.event_name != 'pull_request'
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: dock.mau.dev
         username: ${{ steps.dotenvx.outputs.GLCR_MAUDEV_BOT_USERNAME }}
@@ -221,7 +198,7 @@ jobs:
 
     - name: Extract Docker metadata
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: |
           ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
@@ -236,7 +213,7 @@ jobs:
           type=raw,prefix=branch-,value={{branch}}
 
     - name: Build and push image
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v6
       id: build
       with:
         context: docker/pkgops-alpine
@@ -248,7 +225,12 @@ jobs:
       uses: actions/attest-build-provenance@v1
       if: ${{ github.event_name == 'push' }}
       id: attest
+      continue-on-error: true
       with:
-        subject-path: ${{ steps.meta.outputs.tags }}
+        subject-path: |
+          ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
+          dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
+          quay.io/andreijiroh-dev/pkgops-alpine
+          index.docker.io/ajhalili2006/pkgops-alpine
         subject-digest: ${{ steps.build.outputs.digest }}
         push-to-registry: true
