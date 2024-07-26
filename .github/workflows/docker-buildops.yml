@@ -116,7 +116,7 @@ jobs:
       - name: "Build and push Docker image [nightly builds]"
         if: github.event_name == 'schedule'
         id: nightly-build
-        uses: docker/build-push-action@v4.1.1
+        uses: docker/build-push-action@v6
         with:
           context: docker/mkdocs-material
           #file: Dockerfile
@@ -131,7 +131,7 @@ jobs:
       - name: Build and push Docker image
         if: github.event_name != 'schedule'
         id: build
-        uses: docker/build-push-action@v4.1.1
+        uses: docker/build-push-action@v6
         with:
           context: docker/mkdocs-material
           #file: Dockerfile
@@ -236,7 +236,7 @@ jobs:
           type=raw,prefix=branch-,value={{branch}}
 
     - name: Build and push image
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v6
       id: build
       with:
         context: docker/pkgops-alpine
