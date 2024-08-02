@@ -3,6 +3,7 @@ name: Docker Image Builds
 on:
   schedule:
     - cron: '30 */12 * * *'
+  workflow_dispatch:
   push:
     paths:
       - docker/**
@@ -84,14 +85,6 @@ jobs:
           registry: dock.mau.dev
           username: ${{ steps.dotenvx.outputs.GLCR_MAUDEV_BOT_USERNAME }}
           password: ${{ steps.dotenvx.outputs.GLCR_MAUDEV_BOT_PASSWORD }}
-      
-      # Install the cosign tool except on PR
-      # https://github.com/sigstore/cosign-installer
-      - name: Install cosign
-        if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 #v3.5.0
-        with:
-          cosign-release: 'v2.2.4'
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
@@ -115,7 +108,7 @@ jobs:
       # https://github.com/docker/build-push-action   
       - name: Build and push Docker image
         id: build
-        uses: docker/build-push-action@v6.1.1
+        uses: docker/build-push-action@v6
         with:
           context: docker/mkdocs-material
           #file: Dockerfile
@@ -124,17 +117,29 @@ jobs:
           #load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-      - name: Generate image attestation
+          pull: true
+      - name: Generate image attestation for GHCR
         uses: actions/attest-build-provenance@v1
-        if: ${{ github.event_name == 'push' }}
-        continue-on-error: true
-        id: attest
         with:
-          subject-path: |
-            ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
-            dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
-            quay.io/andreijiroh-dev/mkdocs-material
-            index.docker.io/ajhalili2006/mkdocs-material
+          subject-path: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+      - name: Generate image attestation for GitLab Container Registry
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+      - name: Generate image attestation for RHQCR
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: quay.io/andreijiroh-dev/mkdocs-material
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+      - name: Generate image attestation for Docker Hub
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: index.docker.io/ajhalili2006/mkdocs-material
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
   pkgops-alpine:
@@ -187,14 +192,6 @@ jobs:
         registry: dock.mau.dev
         username: ${{ steps.dotenvx.outputs.GLCR_MAUDEV_BOT_USERNAME }}
         password: ${{ steps.dotenvx.outputs.GLCR_MAUDEV_BOT_PASSWORD }}
-    
-    # Install the cosign tool except on PR
-    # https://github.com/sigstore/cosign-installer
-    - name: Install cosign
-      if: github.event_name != 'pull_request'
-      uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 #v3.5.0
-      with:
-        cosign-release: 'v2.2.4'
 
     - name: Extract Docker metadata
       id: meta
@@ -220,17 +217,28 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-    
-    - name: Generate image attestation
+        pull: true
+    - name: Generate image attestation for GHCR
       uses: actions/attest-build-provenance@v1
-      if: ${{ github.event_name == 'push' }}
-      id: attest
-      continue-on-error: true
       with:
-        subject-path: |
-          ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
-          dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
-          quay.io/andreijiroh-dev/pkgops-alpine
-          index.docker.io/ajhalili2006/pkgops-alpine
+        subject-path: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
+        subject-digest: ${{ steps.build.outputs.digest }}
+        push-to-registry: true
+    - name: Generate image attestation for GitLab Container Registry
+      uses: actions/attest-build-provenance@v1
+      with:
+        subject-path: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
+        subject-digest: ${{ steps.build.outputs.digest }}
+        push-to-registry: true
+    - name: Generate image attestation for RHQCR
+      uses: actions/attest-build-provenance@v1
+      with:
+        subject-path: quay.io/andreijiroh-dev/pkgops-alpine
+        subject-digest: ${{ steps.build.outputs.digest }}
+        push-to-registry: true
+    - name: Generate image attestation for Docker Hub
+      uses: actions/attest-build-provenance@v1
+      with:
+        subject-path: index.docker.io/ajhalili2006/pkgsops-alpine
         subject-digest: ${{ steps.build.outputs.digest }}
         push-to-registry: true

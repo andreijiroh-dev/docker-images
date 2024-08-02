@@ -9,8 +9,11 @@ LABEL org.opencontainers.image.description="GitLab CI image for a custom mkdocs-
       org.opencontainers.image.vendor="Andrei Jiroh Halili" \
       org.opencontainers.image.url="https://go.andreijiroh.xyz/mkdocs-material" \
       org.opencontainers.image.documentation="https://github.com/andreijiroh-dev/docker-images/blob/main/docker/mkdocs-material/README.md" \
-      dev.recaptime.opensource.stabilityLevel="unstable" dev.recaptime.opensource.maintainer="ajhalili2006" \
-      dev.recaptime.opensource.license="MPL-2.0" dev.recaptime.opensource.repoOwnerType="staff-verified-public" org.opencontainers.image.license="MPL-2.0"
+      org.opencontainers.image.license="MPL-2.0"
+LABEL dev.recaptime.opensource.stabilityLevel="unstable" \
+      dev.recaptime.opensource.maintainer="ajhalili2006" \
+      dev.recaptime.opensource.license="MPL-2.0" \
+      dev.recaptime.opensource.repoOwnerType="staff-verified-public" 
       
 
 # Since hadolint isn't in the package repos for Alpine yet, we'll copying from the offical
