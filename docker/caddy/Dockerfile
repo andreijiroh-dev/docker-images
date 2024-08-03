@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM tailscale/tailscale:latest as tailscale
 
-FROM caddy:2.8.4-builder-alpine as builder
+FROM caddy:builder-alpine as builder
 
 RUN xcaddy build \
     --with github.com/caddy-dns/cloudflare \
@@ -11,7 +11,7 @@ RUN xcaddy build \
     --with github.com/sagikazarmark/caddy-fs-s3 \
     --with github.com/kadeessh/kadeessh
 
-FROM caddy:2.8.4-alpine as deploy
+FROM caddy:alpine as deploy
 
 COPY entrypoint.sh /usr/local/bin/
 RUN apk add --no-cache ca-certificates iptables iproute2 ip6tables \
