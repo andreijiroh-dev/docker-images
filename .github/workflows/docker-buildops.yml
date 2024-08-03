@@ -111,35 +111,35 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: docker/mkdocs-material
-          #file: Dockerfile
           # workaround: https://github.com/moby/buildkit/issues/2713#issuecomment-1068540101
           push: ${{ github.event_name != 'pull_request' }}
-          #load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           pull: true
+          provenance: mode=max
+          sbom: true
       - name: Generate image attestation for GHCR
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+          subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
       - name: Generate image attestation for GitLab Container Registry
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+          subject-name: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
       - name: Generate image attestation for RHQCR
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: quay.io/andreijiroh-dev/mkdocs-material
+          subject-name: quay.io/andreijiroh-dev/mkdocs-material
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
       - name: Generate image attestation for Docker Hub
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: index.docker.io/ajhalili2006/mkdocs-material
+          subject-name: index.docker.io/ajhalili2006/mkdocs-material
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
   pkgops-alpine:
@@ -218,27 +218,29 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         pull: true
+        provenance: mode=max
+        sbom: true
     - name: Generate image attestation for GHCR
       uses: actions/attest-build-provenance@v1
       with:
-        subject-path: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
+        subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
         subject-digest: ${{ steps.build.outputs.digest }}
         push-to-registry: true
     - name: Generate image attestation for GitLab Container Registry
       uses: actions/attest-build-provenance@v1
       with:
-        subject-path: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
+        subject-name: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
         subject-digest: ${{ steps.build.outputs.digest }}
         push-to-registry: true
     - name: Generate image attestation for RHQCR
       uses: actions/attest-build-provenance@v1
       with:
-        subject-path: quay.io/andreijiroh-dev/pkgops-alpine
+        subject-name: quay.io/andreijiroh-dev/pkgops-alpine
         subject-digest: ${{ steps.build.outputs.digest }}
         push-to-registry: true
     - name: Generate image attestation for Docker Hub
       uses: actions/attest-build-provenance@v1
       with:
-        subject-path: index.docker.io/ajhalili2006/pkgsops-alpine
+        subject-name: index.docker.io/ajhalili2006/pkgsops-alpine
         subject-digest: ${{ steps.build.outputs.digest }}
         push-to-registry: true
