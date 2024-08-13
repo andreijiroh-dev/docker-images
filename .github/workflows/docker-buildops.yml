@@ -124,12 +124,12 @@ jobs:
           subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
-      - name: Generate image attestation for GitLab Container Registry
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
-          subject-digest: ${{ steps.build.outputs.digest }}
-          push-to-registry: true
+      #- name: Generate image attestation for GitLab Container Registry
+      #  uses: actions/attest-build-provenance@v1
+      #  with:
+      #    subject-name: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
+      #    subject-digest: ${{ steps.build.outputs.digest }}
+      #    push-to-registry: true
       - name: Generate image attestation for RHQCR
         uses: actions/attest-build-provenance@v1
         with:
@@ -226,12 +226,12 @@ jobs:
         subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
         subject-digest: ${{ steps.build.outputs.digest }}
         push-to-registry: true
-    - name: Generate image attestation for GitLab Container Registry
-      uses: actions/attest-build-provenance@v1
-      with:
-        subject-name: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
-        subject-digest: ${{ steps.build.outputs.digest }}
-        push-to-registry: true
+    #- name: Generate image attestation for GitLab Container Registry
+    #  uses: actions/attest-build-provenance@v1
+    #  with:
+    #    subject-name: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
+    #    subject-digest: ${{ steps.build.outputs.digest }}
+    #    push-to-registry: true
     - name: Generate image attestation for RHQCR
       uses: actions/attest-build-provenance@v1
       with:
