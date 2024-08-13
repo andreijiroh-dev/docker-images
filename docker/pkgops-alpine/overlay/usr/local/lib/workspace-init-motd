@@ -1,0 +1,18 @@
+Welcome to your aports dev environment in Docker!
+
+Docs:      https://wiki.andreijiroh.xyz/garden/tools/pkgops-alpine-docker
+Donate:    https://sponsors.andreijiroh.xyz
+Community: https://wiki.andreijiroh.xyz/community-hubs
+
+Working with packages:
+
+ - Build package: cd <main|community|testing>/<package> && abuild
+ - Bump versions: abump <package>-<version>
+ - Use shellcheck: apkbuild-shellcheck <path/to/APKBUILD>
+
+Using the GitLab CLI:
+
+ - Login: glab auth login -h gitlab.alpinelinux.org
+
+Report issues at https://mau.dev/andreijiroh-dev/docker-images/issues
+or via email at ~ajhalili2006/docker-images@todo.sr.ht.

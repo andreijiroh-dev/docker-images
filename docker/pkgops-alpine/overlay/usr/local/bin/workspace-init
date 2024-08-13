@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+# shellcheck shell=sh
+SUDO=${SUDO:-"doas"}
+
+echo "[workspace-init] running container initialization"
+$SUDO apk update
+$SUDO chown -R "$(id -u):bulldozer" $HOME
+git config --global user.name "$GIT_AUTHOR_NAME"
+git config --global user.email "$GIT_AUTHOR_EMAIL"
+echo
+cat /usr/local/lib/workspace-init-motd
+
+if [ "$1" = "" ]; then
+  exec ash -l
+else
+  exec "$@"
+fi
