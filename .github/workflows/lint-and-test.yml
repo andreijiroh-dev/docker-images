@@ -1,0 +1,21 @@
+name: Linters and Tests
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - docker/**
+
+jobs:
+  hadolint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+            dockerfile: Dockerfile
+            recursive: true
+            trusted-registries: quay.io, ghcr.io,docker.io,dock.mau.dev,index.docker.io,registry-1.docker.io
+        continue-on-error: true
