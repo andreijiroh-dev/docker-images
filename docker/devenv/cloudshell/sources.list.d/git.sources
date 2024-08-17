@@ -1,0 +1,5 @@
+Types: deb
+URIs: https://packagecloud.io/github/git-lfs/debian
+Suites: bullseye
+Components: main
+Signed-By: /usr/share/keyrings/github_git-lfs.gpg

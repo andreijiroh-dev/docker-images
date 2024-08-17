@@ -34,3 +34,13 @@ Collection of Docker image + Compose recipes and related utilities in one monore
 | --- | --- | --- | --- |
 | `mkdocs-material` | [README](./docker/mkdocs-material/Dockerfile), [Dockerfile](./docker/mkdocs-material/Dockerfile), [Mkdocs theme docs](https://squidfunk.github.io/mkdocs-material) | Custom image for `mkdocs-material` with Node.js and other tools @ajhalili2006 used on GitLab CI | `python:3.12-alpine` |
 | `pkgops-alpine` | [README](./docker/pkgops-alpine/README.md), [Dockerfile](./docker/pkgops-alpine/Dockerfile) | My Alpine Linux Docker image for `aports` development. | 
+
+## Build
+
+Use the provided build script to locally build images via Docker (disable BuildKit with `DOCKER_BUILDKIT=0`).
+
+```bash
+scripts/build <image> [tag]
+```
+
+Add additional `docker build` flags via `DOCKER_BUILD_ARGS` variable as needed.

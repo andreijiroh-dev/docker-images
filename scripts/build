@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -e
+
+if [[ $DEBUG != "" ]]; then
+    set -x
+fi
+
+main() {
+    DOCKER_BUILD_ARGS=${DOCKER_BUILD_ARGS:-}
+    GIT_ROOT_TMP=$(git rev-parse --show-toplevel)
+    GIT_ROOT=${GIT_ROOT:-"$GIT_ROOT_TMP"}
+    DOCKER_BUILDKIT=${DOCKER_BUILDKIT:-"1"}
+    BUILD_DIR="docker/${1}"
+    DOCKER_IMAGE_NAME=${2:-"dock.mau.dev/andreijiroh-dev/docker-images/${1}"}
+
+    if [[ ! -d "${GIT_ROOT}/${BUILD_DIR}" ]]; then
+        echo "error: ${BUILD_DIR} does not exist here"
+        return 1
+    fi
+
+    docker build -f "${GIT_ROOT}/${BUILD_DIR}/Dockerfile" \
+      -t "${DOCKER_IMAGE_NAME}:localdev" \
+      ${DOCKER_BUILD_ARGS} \
+      "${GIT_ROOT}/${BUILD_DIR}"
+}
+
+main "$*"
