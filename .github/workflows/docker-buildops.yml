@@ -403,7 +403,7 @@ jobs:
             type=schedule,prefix=nightly-,pattern={{date 'YYYYMMDDhhmmss'}}
             type=raw,prefix=branch-,value={{branch}}
 
-      - name: Extract Docker metadata
+      - name: Extract Docker metadata for FrankenPHP
         id: meta-frankenphp
         uses: docker/metadata-action@v5
         with:
@@ -436,8 +436,8 @@ jobs:
           context: docker/pkgops-alpine
           file: docker/pkgops-alpine/php.Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-frankenphp.outputs.tags }}
+          labels: ${{ steps.meta-frankenphp.outputs.labels }}
           pull: true
           provenance: mode=max
           sbom: true
