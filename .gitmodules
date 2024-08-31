@@ -1,0 +1,3 @@
+[submodule "hackclub-nest"]
+	path = thirdparty/hackclub/nest
+	url = https://github.com/hackclub/nest
