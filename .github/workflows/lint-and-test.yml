@@ -1,10 +1,9 @@
 name: Linters and Tests
 
 on:
+  push:
   pull_request:
     branches: [ "main" ]
-    paths:
-      - docker/**
 
 jobs:
   hadolint:
@@ -17,5 +16,5 @@ jobs:
         with:
             dockerfile: Dockerfile
             recursive: true
-            trusted-registries: quay.io, ghcr.io,docker.io,dock.mau.dev,index.docker.io,registry-1.docker.io
+            trusted-registries: mau.dev,quay.io,ghcr.io,docker.io,dock.mau.dev,index.docker.io,registry-1.docker.io
         continue-on-error: true

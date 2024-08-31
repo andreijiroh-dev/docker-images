@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.3
 ARG ALPINE_RELEASE=edge
-FROM alpine:${ALPINE_RELEASE}
+ARG GITLAB_DEPENDENCY_PROXY_PATH=mau.dev/andreijiroh-dev
+FROM ${GITLAB_DEPENDENCY_PROXY_PATH}/containers/dependency_proxy/alpine:${ALPINE_RELEASE}
 
 # ref: https://gitlab.alpinelinux.org/alpine/infra/docker/build-base/-/merge_requests/1
 ENV SUDO=doas

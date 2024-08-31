@@ -1,0 +1,5 @@
+Types: deb
+URIs: https://dl.cloudsmith.io/public/caddy/xcaddy/deb/debian
+Suites: any-version
+Components: main
+Signed-By: /usr/share/keyrings/caddy-xcaddy-archive-keyring.gpg

@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
-FROM python:3.12-alpine AS buildkit
+ARG GITLAB_DEPENDENCY_PROXY_PATH=mau.dev/andreijiroh-dev
+FROM ${GITLAB_DEPENDENCY_PROXY_PATH}/dependency_proxy/containers/python:3.12-alpine AS buildkit
 # Instead of using Alpine base image and then installing Python from pkgs.al.o,
 # we'll go with the official images instead.
 
