@@ -37,10 +37,12 @@ Collection of Docker image + Compose recipes and related utilities in one monore
 
 ## Build
 
-Use the provided build script to locally build images via Docker (disable BuildKit with `DOCKER_BUILDKIT=0`).
+Use the provided build script to locally build images via Docker (disable BuildKit with `DOCKER_BUILDKIT=0`). Because
+we use GitLab Dependency Proxy, you may need to override `GITLAB_DEPENDENCY_PROXY_PATH` to your GitLab namespace
+URL (e.g. `gitlab.com/your-namespace/here`) and authenicate with Docker CLI before proceeding.
 
 ```bash
-scripts/build <image> [tag]
+[DOCKER_IMAGE_NAME-registry.domain.tld/path/to/image] scripts/build <image> [custom-dockerfile]
 ```
 
 Add additional `docker build` flags via `DOCKER_BUILD_ARGS` variable as needed.
