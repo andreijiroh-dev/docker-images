@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -e
+
+if [[ $DEBUG != "" ]]; then
+    set -x
+fi
+OLD_IMAGE_NAME=${1}
+NEW_IMAGE_NAME=${2}
+
+main() {
+  TIMESTAMP=$(date +%s)
+  docker tag "${OLD_IMAGE_NAME}" "${NEW_IMAGE_NAME}:snapshot-$TIMESTAMP"
+  docker push "${NEW_IMAGE_NAME}:snapshot-$TIMESTAMP"
+}
