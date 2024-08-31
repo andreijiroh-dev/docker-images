@@ -1,0 +1,13 @@
+{
+	# Enable FrankenPHP
+	frankenphp
+	admin off
+}
+
+http://stellapent-cier.fawn-cod.ts.net https://stellapent-cier.local {
+	root /app/public
+	# Enable compression (optional)
+	encode zstd br gzip
+	# Execute PHP files in the current directory and serve assets
+	php_server
+}
