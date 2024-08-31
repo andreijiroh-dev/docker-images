@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+DOCKER_BUILDKIT=1
+
 if [[ $DEBUG != "" ]]; then
     set -x
 fi
