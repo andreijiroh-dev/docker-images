@@ -1,0 +1,22 @@
+source: 
+  url: https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.1.zip
+  directory: mediawiki-1.42.1
+features:
+- mysql
+- php latest
+- ssl
+- ssl on
+- ssl letsencrypt
+- ssl always
+- http 1
+- http
+nginx:
+  root: public_html
+  fastcgi: "on"
+  location:
+  - match: /
+    try_files: $uri $uri/ index.php$is_args$args
+  - match: ~ \.[^\/]+(?<!\.php)$
+    try_files: $uri =404
+commands:
+- echo hello world!
