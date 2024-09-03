@@ -8,8 +8,7 @@ RUN xcaddy build \
     --with github.com/caddy-dns/vercel \
     --with github.com/caddy-dns/netlify \
     --with github.com/ss098/certmagic-s3 \
-    --with github.com/sagikazarmark/caddy-fs-s3 \
-    --with github.com/kadeessh/kadeessh
+    --with github.com/sagikazarmark/caddy-fs-s3
 
 FROM caddy:alpine as runner
 

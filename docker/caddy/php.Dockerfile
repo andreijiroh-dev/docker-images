@@ -56,6 +56,11 @@ RUN xcaddy build \
     --with github.com/dunglas/caddy-cbrotli \
     --with github.com/dunglas/mercure/caddy \
     --with github.com/dunglas/vulcain/caddy \
+    --with github.com/caddy-dns/cloudflare \
+    --with github.com/caddy-dns/vercel \
+    --with github.com/caddy-dns/netlify \
+    --with github.com/ss098/certmagic-s3 \
+    --with github.com/sagikazarmark/caddy-fs-s3 \
     --output /usr/local/bin/frankenphp-buildkit \
     && setcap cap_net_bind_service=+ep /usr/local/bin/frankenphp-buildkit \
 	&& upx --best /usr/local/bin/frankenphp-buildkit
