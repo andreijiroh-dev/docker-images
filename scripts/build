@@ -5,10 +5,15 @@ DOCKER_BUILDKIT=1
 
 if [[ $DEBUG != "" ]]; then
     set -x
+    echo "command args: $*"
+fi
+
+if [[ $1 == "" ]]; then
+  echo "Usage: $0 image [flavor]"
+  exit 1
 fi
 
 main() {
-    echo "command args: $*"
     DOCKER_BUILD_ARGS=${DOCKER_BUILD_ARGS:-}
     GIT_ROOT_TMP=$(git rev-parse --show-toplevel)
     GIT_ROOT=${GIT_ROOT:-"$GIT_ROOT_TMP"}
@@ -18,7 +23,7 @@ main() {
     DOCKER_IMAGE_NAME=${DOCKER_IMAGE_NAME:-"dock.mau.dev/andreijiroh-dev/docker-images/${1}"}
 
     if [[ ! -d "${GIT_ROOT}/${BUILD_DIR}" ]]; then
-        echo "error: ${BUILD_DIR} does not exist here"
+        echo "error: image source directory '${GIT_ROOT}/${BUILD_DIR}' does not exist here"
         return 1
     fi
 
