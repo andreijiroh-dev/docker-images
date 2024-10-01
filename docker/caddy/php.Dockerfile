@@ -2,7 +2,6 @@
 ARG GITLAB_DEPENDENCY_PROXY_PATH=mau.dev/andreijiroh-dev
 
 FROM ${GITLAB_DEPENDENCY_PROXY_PATH}/dependency_proxy/containers/tailscale/tailscale:latest as tailscale
-
 FROM ${GITLAB_DEPENDENCY_PROXY_PATH}/dependency_proxy/containers/golang:1.22.5-alpine as golang
 
 # At this stage, we need to compile go from source using go1.22.5 binaries from official image
@@ -66,6 +65,17 @@ RUN xcaddy build \
 	&& upx --best /usr/local/bin/frankenphp-buildkit
 
 FROM ${GITLAB_DEPENDENCY_PROXY_PATH}/dependency_proxy/containers/dunglas/frankenphp:alpine as runner
+
+LABEL org.opencontainers.image.description="Custom FrankenPHP Docker image with additional Caddy DNS and storage plugins" \
+      org.opencontainers.image.source="https://github.com/andreijiroh-dev/docker-images" \
+      org.opencontainers.image.vendor="Andrei Jiroh Halili" \
+      org.opencontainers.image.url="https://go.andreijiroh.dev/caddy" \
+      org.opencontainers.image.documentation="https://github.com/andreijiroh-dev/docker-images/blob/main/docker/caddy/README.md" \
+      org.opencontainers.image.license="MPL-2.0"
+LABEL dev.recaptime.opensource.stabilityLevel="unstable" \
+      dev.recaptime.opensource.maintainer="ajhalili2006" \
+      dev.recaptime.opensource.license="MPL-2.0" \
+      dev.recaptime.opensource.repoOwnerType="staff-verified-public" 
 
 COPY --from=builder /usr/local/bin/frankenphp-buildkit /usr/local/bin/frankenphp
 COPY --from=tailscale /usr/local/bin/tailscale /usr/local/bin/tailscaled /usr/local/bin/

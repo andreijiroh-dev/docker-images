@@ -1,5 +1,7 @@
 # `caddy` with plugins + `tailscale`
 
+We use a custom build of Caddy with hand-picked plugins and Tailscale
+
 ## Included caddy plugins
 
 ### DNS challenges
@@ -13,9 +15,12 @@
 * <https://github.com/ss098/certmagic-s3>
 * <https://github.com/sagikazarmark/caddy-fs-s3>
 
+### PHP setups
+
+
+
 ## Extracting the binary
 
-```
-docker run -v /path/to/caddyfile:/etc/caddy/Caddyfile -p 8080:8080 quay.io/andreijiroh-dev/caddy-tailscale
-
+```bash
+docker run --rm -v ./out:/out ghcr.io/andreijiroh-dev/docker-images/caddy # (or frankenphp)
 ```

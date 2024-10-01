@@ -9,8 +9,7 @@ RUN curl -o /usr/local/bin/install-packages -fsSL https://github.com/gitpod-io/w
     && chmod +x /usr/local/bin/install-packages \
     && ln -s /usr/local/bin/install-packages /usr/local/bin/upgrade-packages
 
-RUN yes | unminimize \
-    && install-packages \
+RUN install-packages \
         zip \
         unzip \
         bash-completion \
@@ -60,16 +59,12 @@ RUN install-packages git git-lfs git-email \
 RUN install-packages tailscale \
     && update-alternatives --set ip6tables /usr/sbin/ip6tables-nft
 
-# Setup both devenv user and Gitpod compat user for use in Gitpod.
+# Setup Gitpod user for compat
 RUN userdel ubuntu -f -r && \
     useradd -l -u 33333 -G sudo -md /home/gitpod -s /bin/bash -p gitpod gitpod \
-    && useradd -l -u 1000 -G sudo,gitpod -md /home/user -s /bin/bash -p devenv user \
     # Remove `use_pty` option and enable passwordless sudo.
     && sed -i.bkp -e '/Defaults\tuse_pty/d' -e 's/%sudo\s\+ALL=(ALL\(:ALL\)\?)\s\+ALL/%sudo ALL=NOPASSWD:ALL/g' /etc/sudoers \
     && mkdir /workspace && chown -hR gitpod:gitpod /workspace
 
-USER user
-WORKDIR /home/user
-ARG dotfiles=https://mau.dev/andreijiroh-dev/dotfiles
-ARG dotfilesBranch=main
-RUN yadm clone ${dotfiles} && yadm restore --staged $HOME && yadm checkout ${dotfilesBranch} -- $HOME
+USER gitpod
+WORKDIR /home/gitpod

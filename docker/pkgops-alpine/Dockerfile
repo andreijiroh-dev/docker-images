@@ -3,6 +3,17 @@ ARG ALPINE_RELEASE=edge
 ARG GITLAB_DEPENDENCY_PROXY_PATH=mau.dev/andreijiroh-dev
 FROM ${GITLAB_DEPENDENCY_PROXY_PATH}/containers/dependency_proxy/alpine:${ALPINE_RELEASE}
 
+LABEL org.opencontainers.image.description="Custom CI image for Alpine Linux package devs and maintainers" \
+      org.opencontainers.image.source="https://github.com/andreijiroh-dev/docker-images" \
+      org.opencontainers.image.vendor="Andrei Jiroh Halili" \
+      org.opencontainers.image.url="https://go.andreijiroh.dev/docker-apkbuild" \
+      org.opencontainers.image.documentation="https://github.com/andreijiroh-dev/docker-images/blob/main/docker/pkgops-alpine/README.md" \
+      org.opencontainers.image.license="MPL-2.0"
+LABEL dev.recaptime.opensource.stabilityLevel="unstable" \
+      dev.recaptime.opensource.maintainer="ajhalili2006" \
+      dev.recaptime.opensource.license="MPL-2.0" \
+      dev.recaptime.opensource.repoOwnerType="staff-verified-public" 
+
 # ref: https://gitlab.alpinelinux.org/alpine/infra/docker/build-base/-/merge_requests/1
 ENV SUDO=doas
 
