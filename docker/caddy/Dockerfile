@@ -27,7 +27,7 @@ COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 COPY --from=tailscale /usr/local/bin/tailscale /usr/local/bin/tailscaled /usr/local/bin/
 COPY entrypoint.sh /usr/local/bin/
 
-RUN apk add --no-cache ca-certificates iptables iproute2 ip6tables bash ca-certificates libcap mailcap \
+RUN apk add --no-cache ca-certificates iptables iproute2 ip6tables bash ca-certificates libcap mailcap dumb-init \
     && mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale \
     && setcap cap_net_bind_service=+ep /usr/bin/caddy
 
