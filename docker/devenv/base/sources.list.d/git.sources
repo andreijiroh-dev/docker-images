@@ -1,11 +1,11 @@
 Types: deb
 URIs: https://ppa.launchpadcontent.net/git-core/ppa/ubuntu
-Suites: noble
+Suites: jammy
 Components: main
 Signed-By: /usr/share/keyrings/git-ppa-archive-keyring.gpg
 
 Types: deb
 URIs: https://packagecloud.io/github/git-lfs/ubuntu
-Suites: noble
+Suites: jammy
 Components: main
 Signed-By: /usr/share/keyrings/github_git-lfs.gpg

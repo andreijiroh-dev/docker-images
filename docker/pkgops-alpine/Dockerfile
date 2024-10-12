@@ -1,7 +1,6 @@
 # syntax=docker/dockerfile:1.3
 ARG ALPINE_RELEASE=edge
-ARG GITLAB_DEPENDENCY_PROXY_PATH=mau.dev/andreijiroh-dev
-FROM ${GITLAB_DEPENDENCY_PROXY_PATH}/containers/dependency_proxy/alpine:${ALPINE_RELEASE}
+FROM alpine:${ALPINE_RELEASE}
 
 LABEL org.opencontainers.image.description="Custom CI image for Alpine Linux package devs and maintainers" \
       org.opencontainers.image.source="https://github.com/andreijiroh-dev/docker-images" \

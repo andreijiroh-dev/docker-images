@@ -1,0 +1,5 @@
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: jammy
+Components: stable
+Signed-By: /usr/share/keyrings/docker-archive-keyring.gpg

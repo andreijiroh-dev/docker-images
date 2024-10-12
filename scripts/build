@@ -40,4 +40,4 @@ main() {
       "${GIT_ROOT}/${BUILD_DIR}"
 }
 
-main $*
+main "$@"

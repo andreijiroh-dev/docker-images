@@ -1,2 +1,36 @@
-version: "2"
+services:
+  mediawiki-caddy:
+    build:
+      context: ./mediawiki
+      dockerfile: Dockerfile
+    # uncomment the following line if you want to run this in a production environment
+    restart: always
+    ports:
+      - "4208:80" # HTTP
+    volumes:
+      - ./config/mw/LocalSettings.php:/app/public/LocalSettings.php
+      - caddy_data:/data
+      - caddy_config:/config
+    cap_add:
+      - 
+    # comment the following line in production, it allows to have nice human-readable logs in dev
+    #tty: true
+  db-backend:
+    image: mariadb
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      # @see https://phabricator.wikimedia.org/source/mediawiki/browse/master/includes/DefaultSettings.php
+      MYSQL_DATABASE: mediawiki-localdev
+      MYSQL_USER: wikiuser
+      MYSQL_PASSWORD:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+    volumes:
+      - db:/var/lib/mysql
 
+# Volumes needed for Caddy certificates and configuration
+volumes:
+  caddy_data:
+  caddy_config:
+  db:
