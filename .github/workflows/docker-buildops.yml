@@ -111,25 +111,25 @@ jobs:
           provenance: mode=max
           sbom: true
       - name: Generate image attestation for GHCR
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v2
         with:
           subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
       #- name: Generate image attestation for GitLab Container Registry
-      #  uses: actions/attest-build-provenance@v1
+      #  uses: actions/attest-build-provenance@v2
       #  with:
       #    subject-name: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/mkdocs-material
       #    subject-digest: ${{ steps.build.outputs.digest }}
       #    push-to-registry: true
       - name: Generate image attestation for RHQCR
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v2
         with:
           subject-name: quay.io/andreijiroh-dev/mkdocs-material
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
       - name: Generate image attestation for Docker Hub
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v2
         with:
           subject-name: index.docker.io/ajhalili2006/mkdocs-material
           subject-digest: ${{ steps.build.outputs.digest }}
@@ -228,19 +228,19 @@ jobs:
           provenance: mode=max
           sbom: true
       - name: Generate image attestation for GHCR
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v2
         with:
           subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/devenv/base
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
       - name: Generate image attestation for RHQCR
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v2
         with:
           subject-name: quay.io/andreijiroh-dev/devenv-base
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
       - name: Generate image attestation for Docker Hub
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v2
         with:
           subject-name: index.docker.io/ajhalili2006/devenv-base
           subject-digest: ${{ steps.build.outputs.digest }}
@@ -332,25 +332,25 @@ jobs:
         provenance: mode=max
         sbom: true
     - name: Generate image attestation for GHCR
-      uses: actions/attest-build-provenance@v1
+      uses: actions/attest-build-provenance@v2
       with:
         subject-name: ghcr.io/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
         subject-digest: ${{ steps.build.outputs.digest }}
         push-to-registry: true
     #- name: Generate image attestation for GitLab Container Registry
-    #  uses: actions/attest-build-provenance@v1
+    #  uses: actions/attest-build-provenance@v2
     #  with:
     #    subject-name: dock.mau.dev/${{ env.IMAGE_NAME_PREFIX }}/pkgops-alpine
     #    subject-digest: ${{ steps.build.outputs.digest }}
     #    push-to-registry: true
     - name: Generate image attestation for RHQCR
-      uses: actions/attest-build-provenance@v1
+      uses: actions/attest-build-provenance@v2
       with:
         subject-name: quay.io/andreijiroh-dev/pkgops-alpine
         subject-digest: ${{ steps.build.outputs.digest }}
         push-to-registry: true
     - name: Generate image attestation for Docker Hub
-      uses: actions/attest-build-provenance@v1
+      uses: actions/attest-build-provenance@v2
       with:
         subject-name: index.docker.io/ajhalili2006/pkgsops-alpine
         subject-digest: ${{ steps.build.outputs.digest }}
