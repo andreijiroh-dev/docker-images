@@ -1,0 +1,31 @@
+version: "2"
+
+networks:
+  forgejo:
+    external: false
+
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    pull_policy: always
+    hostname: webserver2
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_EXTRA_ARGS=--advertise-tags=tag:docker,tag:devops
+      - TS_STATE_DIR=/var/lib/tailscale
+    volumes:
+      - tailscale-data-webserver2:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+  git:
+    image: codeberg.org/forgejo/forgejo:7
+    container_name: forgejo
+    environment:
+      - USER_UID=${USER_UID:-1000}
+      - USER_GID=${USER_GID:-1000}
+    restart: always
+    networks:
+      - forgejo
+    volumes:
+      - ./forgejo:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
