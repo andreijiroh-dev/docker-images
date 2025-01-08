@@ -54,7 +54,7 @@ RUN apk add --no-cache \
      rsync \
      libstdc++ \
   && curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh \
-    | sh -s --debug
+    | sh -s -- --debug
 
 # Copy build artifacts from official node image into here
 ENV YARN_VERSION 1.22.22
