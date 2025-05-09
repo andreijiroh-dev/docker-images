@@ -58,10 +58,10 @@ RUN apk add --no-cache \
 
 # Copy build artifacts from official node image into here
 ENV YARN_VERSION 1.22.22
-COPY --from=node:20-alpine /opt/yarn-v$YARN_VERSION /opt/yarn-v$YARN_VERSION
-COPY --from=node:20-alpine /usr/local/bin/node /usr/local/bin/node
-COPY --from=node:20-alpine /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
-COPY --from=node:20-alpine /usr/local/include/node/ /usr/local/include/node/
+COPY --from=node:22-alpine /opt/yarn-v$YARN_VERSION /opt/yarn-v$YARN_VERSION
+COPY --from=node:22-alpine /usr/local/bin/node /usr/local/bin/node
+COPY --from=node:22-alpine /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
+COPY --from=node:22-alpine /usr/local/include/node/ /usr/local/include/node/
 
 RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs \
     && ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
