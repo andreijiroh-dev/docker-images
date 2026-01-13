@@ -10,7 +10,7 @@ RUN xcaddy build \
     --with github.com/ss098/certmagic-s3 \
     --with github.com/sagikazarmark/caddy-fs-s3
 
-FROM caddy:alpine as runner
+FROM caddy:2.11-alpine as runner
 
 LABEL org.opencontainers.image.description="Plain Caddy and community plugins, minus FrankenPHP." \
       org.opencontainers.image.source="https://github.com/andreijiroh-dev/docker-images" \
